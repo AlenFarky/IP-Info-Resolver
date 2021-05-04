@@ -1,0 +1,156 @@
+html,
+body {
+  min-height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 4rem;
+  background: url("../images/pattern-bg.png") no-repeat;
+  background-size: cover;
+  text-align: center;
+
+  height: 30vh;
+  position: relative;
+}
+
+header h1 {
+  color: #fff;
+  margin-bottom: 3rem;
+}
+
+a:visited{
+text-decoration: none;
+color: #404040;
+}
+
+img[src="https://cdn.000webhost.com/000webhost/logo/footer-powered-by-000webhost-white2.png"] {
+    display: none;
+}
+
+.input-container {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  border-radius: 1.7rem;
+  overflow: hidden;
+  margin-bottom: 3rem;
+}
+
+.input-container input {
+  flex-grow: 1;
+  font-weight: 500;
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
+}
+
+.input-container button {
+  background: var(--veryDarkGray);
+  color: #fff;
+
+  display: grid;
+  place-content: center;
+
+  padding: 1.5rem;
+  cursor: pointer;
+  font-size: 2.5rem;
+
+  transition: all 0.3s ease-out;
+  border: none;  
+}
+
+.input-container button:hover {
+  background: var(--darkGray);
+}
+
+.location-container {
+  position: relative;
+  z-index: 5;
+  background: #fff;
+  border-radius: 1.5rem;
+
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+
+  row-gap: 3rem;
+  padding: 3rem 0;
+}
+
+.location-container.active {
+  display: flex;
+}
+
+.location-container div h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.7rem;
+  color: var(--darkGray);
+  text-transform: uppercase;
+}
+
+.location-container div p {
+  font-size: 2.2rem;
+  font-weight: 600;
+}
+
+main {
+  z-index: 0;
+  flex-grow: 1;
+}
+
+#map {
+  height: 700px;
+  /* width: 100%; */
+}
+
+.leaflet-bar {
+  display: none;
+}
+
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.6);
+}
+
+#loader.active {
+  display: flex;
+}
+
+@media screen and (min-width: 700px) {
+  .input-container {
+    margin: 0 auto 3rem;
+    max-width: 500px;
+  }
+
+  .location-container {
+    flex-direction: row;
+    column-gap: 5rem;
+    padding: 3rem;
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .location-container {
+    margin: 0 auto;
+    max-width: 1200px;
+    column-gap: 100px;
+  }
+}

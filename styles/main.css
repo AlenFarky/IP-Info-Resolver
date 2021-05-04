@@ -1,0 +1,17 @@
+:root {
+  font-size: 62.5%;
+
+  --mobile-breakpoint: 375px;
+  --desktop-breakpoint: 1440px;
+
+  --darkGray: rgb(150, 150, 150);
+  --veryDarkGray: rgb(43, 43, 43);  
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  font-family: "Rubik", sans-serif;
+}
