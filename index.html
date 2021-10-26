@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Info - Pretraga</title>
+    <link rel="shortcut icon" href="images/favicon-32x32.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1><a href="index.html" style="position: relative; text-decoration: none; top:25px;">IP Info Pretraga</a></h1>
+		<h1>made by <a href="https://farky.xyz/" target="_blank" style="text-decoration: none">Farky™</a></h1>
+
+
+
+        <h3 style="position: absolute; font-size:17px; top:7px; left:7px; color:#fff;">Tvoj IP: </h3>
+        <h3 style="position: absolute; font-size:17px; top:29px; left:7px; color:#fff;" id="ip">Učitavanje...</h3>
+
+
+        <form class="input-container">
+            <input type="text" placeholder="Upiši IP adresu"
+                pattern="(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}"
+                title="">
+            <button type="submit">
+                <span class="material-icons-outlined"> navigate_next </span>
+            </button>
+        </form>
+        <section class="location-container">
+            <div>
+                <h3>IP Adresa</h3>
+                <p id="ipP"></p>
+            </div>
+            <div>
+                <h3>Država</h3>
+                <p id="countryP"></p>
+            </div>
+            <div>
+                <h3>Lokacija</h3>
+                <p id="localP"></p>
+            </div>
+            <div>
+                <h3>ISP</h3>
+                <p id="ispP"></p>
+            </div>
+        </section>
+    </header>
+
+
+    <main>
+        <div id="map"></div>
+    </main>
+
+    <div id="loader">
+        <img src="./images/loader.gif" alt="loading">
+    </div>
+    <script src="js/app.js"></script>
+	<script src="js/inspect.js"></script>
+    <script src="js/ip.js"></script>
+</body>
+
+</html>
