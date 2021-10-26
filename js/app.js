@@ -15,19 +15,20 @@ let marker;
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 async function trackIp() {
-  const apiKey = "at_Zkj2I9Rvs4tkAXdj4comO54BwLpvB";
+  const apiKey = "at_hYyOMTlK6kMMpjptobg8CyxgB3DOO"; // at_Zkj2I9Rvs4tkAXdj4comO54BwLpvB //
   const query = document.querySelector(".input-container input").value;
 
   if (query === "") {
     throw new Error("Error: IP Adresa nije upisana.");
   }
 
-  const url = `https://geo.ipify.org/api/v1?apiKey=${apiKey}&ipAddress=${query}`;
+  const url = `https://geo.ipify.org/api/v1?apiKey=${apiKey}&ipAddress=${query}&domain=${query}`;
+ 
 
   const result = await fetch(url);
   const json = await result.json();
   if (json.code == 422) {
-    throw new Error(json.messages);
+    throw new Error("Error: IP Adresa / domena nije točna.");
   }
 
   return json;
