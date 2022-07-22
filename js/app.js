@@ -15,7 +15,7 @@ let marker;
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
 async function trackIp() {
-  const apiKey = "at_Gg6ZYmeKv4zC87nPwanATi8uow1M9";
+  const apiKey = "at_GUTqH4sC2vYT8wrpd18PFEuIRr2JC";
   const query = document.querySelector(".input-container input").value;
 
   if (query === "") {
