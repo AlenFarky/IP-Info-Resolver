@@ -22,7 +22,7 @@ async function trackIp() {
     throw new Error("Error: IP Adresa nije upisana.");
   }
 
-  const url = `https://geo.ipify.org/api/v2/country,city?apiKey=${apiKey}&ipAddress=${query}&domain=${query}`;
+  const url = `https://geo.ipify.org/api/v2/country,city?apiKey=${apiKey}&ipAddress=${query}`;
  
 
   const result = await fetch(url);
