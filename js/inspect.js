@@ -1,7 +1,3 @@
-document.addEventListener('contextmenu', function(e) {
- e.preventDefault();
-});
-
 document.onkeydown = function(e) {
  if(event.keyCode == 123) {
     return false;
