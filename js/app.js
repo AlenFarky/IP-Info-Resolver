@@ -35,13 +35,31 @@ map.on('drag', function() {
   map.setView(map.getCenter());  // Održava mapu u centru kad se pokuša prevazići granice
 });
 
+function showAlert(title, text, icon) {
+  return Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+      showConfirmButton: false,
+      timer: 2400,
+  });
+}
+
+// Function to get country name from ISO code
+function getCountryName(countryCode) {
+  return countryNames[countryCode] || countryCode; // Fallback to the code if not found
+}
+
 async function trackIp() {
-  const apiKey = "at_XUqYZhpTeJ3vZhs72WSjsHci36Rwr";
+  const apiKey = "at_Gg6ZYmeKv4zC87nPwanATi8uow1M9";
   let query = inputField.value.trim(); // Uklonite razmake sa početka i kraja
 
   if (query === "") {
-    throw new Error("Error: IP Adresa nije upisana.");
+    showAlert('Oops!', 'The IP address / domain is not entered.', 'error')
+    return;
   }
+
+  addRequestToQueue();
 
   // Uklonite "http://" ili "https://" iz unosa i ekstraktujte samo domenu
   try {
@@ -64,39 +82,42 @@ async function trackIp() {
     const json = await result.json();
 
     if (json.code === 422) {
-      throw new Error("Error: IP Adresa / domena nije točna.");
+      showAlert('Oops!', 'The IP address/domain is incorrect.', 'error')
     }
 
     // Provjeri da li json.location postoji i ima potrebne podatke
     if (!json.location || !json.location.lat || !json.location.lng) {
-      throw new Error("Error: Nema podataka za ovu IP adresu / domenu.");
+      showAlert('Oops!', 'No data available for this IP address/domain.', 'error')
     }
 
     return json;
   } catch (error) {
-    throw new Error(`Greška prilikom pristupa API-ju: ${error.message}`);
+    showAlert('Oops!', 'Error accessing the API.', 'error')
   }
 }
 
-// Implementacija ograničenja broja zahtjeva
 let requestQueue = [];
 
 function isRateLimited() {
   const now = Date.now();
-  const windowTime = 60000; // 1 minuta
+  const windowTime = 60000; // 1 minute window
   const maxRequests = 10;
 
-  // Ukloni stare zahtjeve koji su izvan prozora
+  // Remove timestamps that are older than the window
   requestQueue = requestQueue.filter(timestamp => now - timestamp < windowTime);
 
+  // Check if the number of requests exceeds the limit
   if (requestQueue.length >= maxRequests) {
     const oldestRequest = requestQueue[0];
-    const timeUntilReset = windowTime - (now - oldestRequest);
+    const timeUntilReset = windowTime - (now - oldestRequest); // Time left for rate limit reset
     return timeUntilReset;
-  } else {
-    requestQueue.push(now);
-    return false;
   }
+
+  return false;
+}
+
+function addRequestToQueue() {
+  requestQueue.push(Date.now());
 }
 
 async function handler(e) {
@@ -105,7 +126,7 @@ async function handler(e) {
   const rateLimit = isRateLimited();
   if (rateLimit !== false) {
     const secondsLeft = Math.ceil(rateLimit / 1000);
-    alert(`Previše zahtjeva! Molimo pričekajte ${secondsLeft} sekundi prije nego što ponovno pokušate.`);
+    showAlert('Oops!', `Too many requests! Please wait ${secondsLeft} seconds before trying again.`, 'error')
     return;
   }
 
@@ -117,8 +138,15 @@ async function handler(e) {
     if (json.location) {
       ipP.innerText = json.ip;
       ispP.innerText = json.isp;
-      countryP.innerText = `${json.location.country}`;
+
+      const countryCode = json.location.country;
+      const fullCountryName = getCountryName(countryCode);
+      countryP.innerText = `${fullCountryName}`;
+      //countryP.innerText = `${json.location.country}`;
+
       localP.innerText = `${json.location.city}, ${json.location.region}`;
+
+
 
       locationContainer.classList.add("active");
 
@@ -131,10 +159,10 @@ async function handler(e) {
       // Dodaj novi marker
       marker = L.marker(geoLocation).addTo(map);
     } else {
-      throw new Error("Error: Ne mogu prikazati podatke o lokaciji.");
+      showAlert('Oops!', 'Unable to display location data.', 'error')
     }
   } catch (error) {
-    alert(error.message);
+    // alert(error.message);
 
     // Ukloni marker ako postoji
     if (marker) {
