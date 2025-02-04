@@ -8,8 +8,12 @@
     <link rel="shortcut icon" href="images/favicon-32x32.png" type="image/x-icon">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/style.css">
+  	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icon-css/css/flag-icon.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/light.css" rel="stylesheet">
+  
+	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link
@@ -33,13 +37,19 @@
         <h3 style="position: absolute; font-size:17px; top:7px; left:7px; color:#fff;">Your IP: </h3>
         <h3 style="position: absolute; font-size:17px; top:29px; left:7px;" id="ip" class="user-ip">Loading...</h3>
 
+      
 
-        <form class="input-container">
-            <input type="text" placeholder="Enter IP address or domain" title="">
+        <form class="input-container" id="ipForm">
+            <input type="text" name="query" id="query" placeholder="Enter IP address or domain" title="">
             <button type="submit">
                 <span class="material-icons-outlined"> navigate_next </span>
             </button>
+          
+          <div class="cf-turnstile" data-size="flexible" data-sitekey="0x4AAAAAAA0sWMC-zAZfeMHj" data-callback="turnstileCallback"></div>
+          
         </form>
+      
+      
         <section class="location-container">
             <div>
                 <h3>IP</h3>
