@@ -1,11 +1,20 @@
 $.getJSON("https://api.ipify.org?format=json", function(data) {
     const ipElement = $("#ip");
     ipElement.html(data.ip);
-    
-    // Dodaj event listener za klik na IP
-    ipElement.on('click', function() {
-        // Ubaci IP u input polje i pokreni handler
+  
+    ipElement.on("click", function() {
+        if (submitButton.disabled) {
+            showAlert("Oops!", "Please wait a few moments for CAPTCHA to validate you.", "error");
+            return;
+        }
+
         inputField.value = data.ip;
-        handler(new Event('submit'));  // Ručno kreiraj event i proslijedi ga handleru
+        handler(new Event("submit"));
+    });
+
+    ipElement.on("touchend", function() {
+        setTimeout(() => {
+            ipElement.css("color", "white");
+        }, 300);
     });
 });
