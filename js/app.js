@@ -3,185 +3,176 @@ const loader = document.querySelector("#loader");
 
 const form = document.querySelector("form");
 const locationContainer = document.querySelector(".location-container");
-const inputField = document.querySelector(".input-container input"); // Dodano za pristup inputu
+const inputField = document.querySelector(".input-container input");
 
 const ipP = document.getElementById("ipP");
 const ispP = document.getElementById("ispP");
 const countryP = document.getElementById("countryP");
 const localP = document.getElementById("localP");
 
-// Postavite minimalni i maksimalni nivo zumiranja
+// Set map limits
 const minZoomLevel = 2;
 const maxZoomLevel = 18;
-
-// Postavite granice za mapu
 const bounds = L.latLngBounds(
-  L.latLng(-90, -180),  // Donji levi ugao
-  L.latLng(90, 180)     // Gornji desni ugao
+  L.latLng(-90, -180),
+  L.latLng(90, 180)
 );
 
 const map = L.map("map", {
   minZoom: minZoomLevel,
   maxZoom: maxZoomLevel,
-  maxBounds: bounds,       // Postavite granice za mapu
-  maxBoundsViscosity: 1.0  // Omogućava automatsko vraćanje mape u granice
+  maxBounds: bounds,
+  maxBoundsViscosity: 1.0
 }).setView([0, 0], minZoomLevel);
 let marker;
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
-// Prilagodite ponašanje mape kada se pokušava pomeriti van granica
 map.on('drag', function() {
-  map.setView(map.getCenter());  // Održava mapu u centru kad se pokuša prevazići granice
+  map.setView(map.getCenter());
 });
 
+// Function to show alert messages
 function showAlert(title, text, icon) {
   return Swal.fire({
-      icon: icon,
-      title: title,
-      text: text,
-      showConfirmButton: false,
-      timer: 2400,
+    icon: icon,
+    title: title,
+    text: text,
+    showConfirmButton: false,
+    timer: 2400,
   });
 }
 
 // Function to get country name from ISO code
 function getCountryName(countryCode) {
-  return countryNames[countryCode] || countryCode; // Fallback to the code if not found
+  return countryNames[countryCode] || countryCode;
 }
 
-async function trackIp() {
-  const apiKey = "at_Gg6ZYmeKv4zC87nPwanATi8uow1M9";
-  let query = inputField.value.trim(); // Uklonite razmake sa početka i kraja
-
-  if (query === "") {
-    showAlert('Oops!', 'The IP address / domain is not entered.', 'error')
-    return;
-  }
-
-  addRequestToQueue();
-
-  // Uklonite "http://" ili "https://" iz unosa i ekstraktujte samo domenu
-  try {
-    const url = new URL(query);
-    query = url.hostname;
-  } catch (error) {
-    if (query.startsWith("http://")) {
-      query = query.slice(7).split('/')[0];
-    } else if (query.startsWith("https://")) {
-      query = query.slice(8).split('/')[0];
-    } else {
-      query = query.split('/')[0];
-    }
-  }
-
-  const apiUrl = `https://geo.ipify.org/api/v1/?apiKey=${apiKey}&domain=${query}`;
-
-  try {
-    const result = await fetch(apiUrl);
-    const json = await result.json();
-
-    if (json.code === 422) {
-      showAlert('Oops!', 'The IP address/domain is incorrect.', 'error')
-    }
-
-    // Provjeri da li json.location postoji i ima potrebne podatke
-    if (!json.location || !json.location.lat || !json.location.lng) {
-      showAlert('Oops!', 'No data available for this IP address/domain.', 'error')
-    }
-
-    return json;
-  } catch (error) {
-    showAlert('Oops!', 'Error accessing the API.', 'error')
-  }
+// Function to generate country flag HTML
+function displayCountryFlag(countryCode, countryName) {
+  if (!countryCode) return countryName; // Fallback to only name if no code
+  let flagClass = `flag-icon flag-icon-${countryCode.toLowerCase()}`;
+  return `<span class="${flagClass}"></span> ${countryName}`;
 }
 
-let requestQueue = [];
+// Get the submit button
+const submitButton = form.querySelector("button[type='submit']");
 
-function isRateLimited() {
-  const now = Date.now();
-  const windowTime = 60000; // 1 minute window
-  const maxRequests = 10;
+// Disable button initially
+submitButton.classList.add("disabled");
+submitButton.setAttribute("disabled", true);
 
-  // Remove timestamps that are older than the window
-  requestQueue = requestQueue.filter(timestamp => now - timestamp < windowTime);
+// Enable button when CAPTCHA is solved
+window.turnstileCallback = function () {
+  console.log("CAPTCHA Verified!");
 
-  // Check if the number of requests exceeds the limit
-  if (requestQueue.length >= maxRequests) {
-    const oldestRequest = requestQueue[0];
-    const timeUntilReset = windowTime - (now - oldestRequest); // Time left for rate limit reset
-    return timeUntilReset;
-  }
+  // Remove disabled state
+  submitButton.classList.remove("disabled");
+  submitButton.removeAttribute("disabled");
+};
 
-  return false;
-}
-
-function addRequestToQueue() {
-  requestQueue.push(Date.now());
-}
-
+// Function to handle form submission
 async function handler(e) {
   e.preventDefault();
 
-  const rateLimit = isRateLimited();
-  if (rateLimit !== false) {
-    const secondsLeft = Math.ceil(rateLimit / 1000);
-    showAlert('Oops!', `Too many requests! Please wait ${secondsLeft} seconds before trying again.`, 'error')
-    return;
-  }
+  // Disable button to prevent multiple submissions
+  submitButton.classList.add("disabled");
+  submitButton.setAttribute("disabled", true);
 
   loader.classList.add("active");
 
+  const formData = new FormData(form);
+  const captchaToken = formData.get("cf-turnstile-response");
+
+  if (!captchaToken) {
+    showAlert('Oops!', 'Please wait few moments for CAPTCHA to validate you.', 'error');
+    loader.classList.remove("active");
+    submitButton.classList.remove("disabled");
+    submitButton.removeAttribute("disabled");
+    return;
+  }
+
+  const query = inputField.value.trim();
+  if (query === "") {
+    showAlert('Oops!', 'The IP address/domain is not entered.', 'error');
+    loader.classList.remove("active");
+    submitButton.classList.remove("disabled");
+    submitButton.removeAttribute("disabled");
+    return;
+  }
+
+  console.log('Sending data to server...');
+  console.log('CAPTCHA Token:', captchaToken);
+  console.log('Query:', query);
+
   try {
-    const json = await trackIp();
+    const response = await fetch("https://captcha.farky.xyz/verify-ip", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query: query,
+        "cf-turnstile-response": captchaToken
+      })
+    });
 
-    if (json.location) {
-      ipP.innerText = json.ip;
-      ispP.innerText = json.isp;
+    const result = await response.json();
+    console.log("Server Response:", result);
 
-      const countryCode = json.location.country;
-      const fullCountryName = getCountryName(countryCode);
-      countryP.innerText = `${fullCountryName}`;
-      //countryP.innerText = `${json.location.country}`;
+    if (result.alert) {
+      showAlert(result.alert.title, result.alert.text, result.alert.icon);
+    }
 
-      localP.innerText = `${json.location.city}, ${json.location.region}`;
+    if (result.data) {
+      ipP.innerText = result.data.ip?.trim() !== "" ? result.data.ip : "N/A";
+      ispP.innerText = result.data.isp?.trim() !== "" ? result.data.isp : "N/A";
 
+      if (result.data?.country && result.data.country.trim() !== "") {
+        const countryCode = result.data.country;
+        const fullCountryName = getCountryName(countryCode);
+        countryP.innerHTML = displayCountryFlag(countryCode, fullCountryName);
+      } else {
+        countryP.innerText = "N/A";
+      }
 
+      if (
+        result.data?.city && result.data.city.trim() !== "" &&
+        result.data?.region && result.data.region.trim() !== ""
+      ) {
+        localP.innerText = `${result.data.city}, ${result.data.region}`;
+      } else {
+        localP.innerText = "N/A";
+      }
 
       locationContainer.classList.add("active");
 
-      const geoLocation = [json.location.lat, json.location.lng];
-      map.setView(geoLocation, Math.min(maxZoomLevel, 13)); // Postavite nivo zumiranja na maksimalni nivo
+      if (result.data?.lat && result.data?.lng) {
+        const geoLocation = [result.data.lat, result.data.lng];
+        map.setView(geoLocation, Math.min(maxZoomLevel, 13));
 
-      // Ukloni prethodni marker ako postoji
-      if (marker) map.removeLayer(marker);
-      
-      // Dodaj novi marker
-      marker = L.marker(geoLocation).addTo(map);
+        if (marker) map.removeLayer(marker);
+        marker = L.marker(geoLocation).addTo(map);
+      }
     } else {
-      showAlert('Oops!', 'Unable to display location data.', 'error')
+      console.warn("Result data is missing or undefined.");
+      showAlert('Oops!', 'Invalid response from server. Please try again.', 'error');
     }
+
   } catch (error) {
-    // alert(error.message);
-
-    // Ukloni marker ako postoji
-    if (marker) {
-      map.removeLayer(marker);
-      marker = null;
-    }
-
-    // Postavi mapu na početni položaj
-    map.setView([0, 0], minZoomLevel);
-
-    // Ukloni locationContainer
-    locationContainer.classList.remove("active");
-    
-    // Očisti input polje
-    inputField.value = '';
+    console.error("Error submitting form:", error);
+    showAlert('Oops!', 'Error processing your request. Please try again later.', 'error');
   } finally {
+    // Reset CAPTCHA & disable button
+    if (typeof turnstile !== 'undefined') {
+      turnstile.reset();
+    }
     loader.classList.remove("active");
+    submitButton.classList.add("disabled");
+    submitButton.setAttribute("disabled", true);
   }
 }
 
+// Attach event listeners
 search.addEventListener("click", handler);
 form.addEventListener("submit", handler);
