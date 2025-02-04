@@ -79,6 +79,14 @@ color: #404040 !important;
   background: var(--darkGray);
 }
 
+.input-container button.disabled {
+  background: var(--darkGray);
+  opacity: 0.7;  /* Makes it visually distinct but not hidden */
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+
 .location-container {
   position: relative;
   z-index: 5;
@@ -165,4 +173,41 @@ main {
   }
 }
 
+/* Mobile Styles */
+@media screen and (max-width: 699px) {
 
+  
+  /* Make the input container and its elements more mobile friendly */
+  .input-container {
+    margin-bottom: 2rem;
+  }
+  
+  .input-container input {
+    font-size: 1.4rem;
+    padding: 0.8rem 1.2rem;
+  }
+  
+  .input-container button {
+    padding: 1rem;
+    font-size: 2rem;
+  }
+  
+  /* Stack location information vertically for easier reading on small screens */
+  .location-container {
+    flex-direction: column;
+    align-items: center;
+    row-gap: 2rem;
+    column-gap: 0;
+    padding: 2rem;
+  }
+  
+  .location-container div h3 {
+    font-size: 1.2rem;
+  }
+  
+  .location-container div p {
+    font-size: 1.8rem;
+  }
+  
+
+}
